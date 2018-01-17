@@ -66,14 +66,18 @@ public class Player: MonoBehaviour {
 
 		}*/
 
+		anim.SetBool ("BackStep",Input.GetKey (KeyCode.A));
+
 		//キーボード処理
 		if (Input.GetKey (KeyCode.A)) {
-			transform.position += new Vector3 (-1.0f, 0, 0) * move;
+			//transform.position += new Vector3 (-1.0f, 0, 0) * move;
 		} else if (Input.GetKey (KeyCode.D)) {
 			transform.position += new Vector3 (1.0f, 0, 0) * move;
 		} else {
 			transform.position += new Vector3 (Input.GetAxis ("Horizontal"), 0, 0) * move;
 		}
+
+
 	}
 
 	/// <summary>
