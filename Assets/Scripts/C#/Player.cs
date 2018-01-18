@@ -4,11 +4,48 @@ using UnityEngine;
 
 public class Player: MonoBehaviour {
 
+	enum ACTION_STATE{
+		Idle = 0,
+		Jub,
+		Kick,
+		MAX
+	};
+
+	class Info{
+		string ActionName;	//名前
+		int Damage;		//ダメージ
+		bool JumpUse;	//ジャンプ中に使用できるアクションか
+		bool MoveUse;	//移動中に使用できるアクションか
+
+		public void DamageCheck(int life)
+		{
+			life -= Damage;
+		}
+
+		public bool JumpUseCheck(bool jump){return (jump == JumpUse) ? true : false;} 
+		public bool MoveUseCheck(bool move){return (move == MoveUse) ? true : false;} 
+
+		public void SetInfo(string s , int d , bool j , bool m)
+		{
+			ActionName = s;
+			Damage = d;
+			JumpUse = j;
+			MoveUse = m;
+		}
+	}
+
+
 	//プレイヤー情報関連
 	private Rigidbody rb;		//RigidBodyの取得
 
 	[SerializeField]
+	private int playerNum;
+
+	[SerializeField]
 	private Animator anim = null;	//アニメーターの取得
+
+	[SerializeField]
+	private int life = 100;
 
 	//移動関連
 	[SerializeField]
@@ -39,7 +76,7 @@ public class Player: MonoBehaviour {
 	float GRAVITY = -0.098f;	//重力
 
 	[SerializeField]
-	GameObject bullet;
+	GameObject bulletPrefab;
 
 	[SerializeField]
 	Transform bulletCreatePos;
@@ -50,10 +87,12 @@ public class Player: MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		rb = GetComponent<Rigidbody> ();
+
 	}
 	
 	// Update is called once per frame
 	void Update () {
+
 
 		Move ();		//移動処理
 
@@ -90,7 +129,7 @@ public class Player: MonoBehaviour {
 		//左移動
 		if (Input.GetKey (KeyCode.A)) {
 			
-			transform.position += new Vector3 (-1.0f, 0, 0) * move;
+			transform.position += new Vector3 (-1.0f, 0, 0) * ((jumpFlg) ? move * 2.0f : move);
 
 			//移動フラグ
 			moveFlg = true;
@@ -102,7 +141,7 @@ public class Player: MonoBehaviour {
 
 		//右移動
 		else if (Input.GetKey (KeyCode.D)) {
-			transform.position += new Vector3 (1.0f, 0, 0) * ((jumpFlg) ? move * 1.5f : move);
+			transform.position += new Vector3 (1.0f, 0, 0) * ((jumpFlg) ? move * 2.0f : move);
 
 			//移動フラグ
 			moveFlg = true;
@@ -161,9 +200,9 @@ public class Player: MonoBehaviour {
 				bulletCreateCnt--;
 
 				if (bulletCreateCnt == 15) {
-					GameObject b = Instantiate (bullet, bulletCreatePos.position, Quaternion.identity);
+					GameObject b = Instantiate (bulletPrefab, bulletCreatePos.position, Quaternion.identity);
 
-					b.GetComponent<Bullet> ().SetUsePlayer (0);
+					b.GetComponent<Bullet> ().SetUsePlayer (playerNum);
 				}
 			}
 		}
@@ -209,5 +248,10 @@ public class Player: MonoBehaviour {
 			jumpFlg = false;
 			velocity = VELOCITY_RESET;	//加速度の初期化
 		}
+	}
+
+	public int GetPlayerNum()
+	{
+		return playerNum;
 	}
 }

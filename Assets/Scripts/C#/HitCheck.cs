@@ -10,6 +10,9 @@ public class HitCheck : MonoBehaviour {
 	[SerializeField]
 	private Animator anim;
 
+	[SerializeField]
+	Player player;
+
 	private bool downFlg = false;
 
 	[SerializeField]
@@ -41,8 +44,12 @@ public class HitCheck : MonoBehaviour {
 	//衝突判定
 	void OnCollisionEnter(Collision col)
 	{
-			if (col.transform.tag == "Attack") {
-			downFlg = true;
+		if (null != col.gameObject.GetComponent<Player> ()) {
+			if (col.gameObject.GetComponent<Player> ().GetPlayerNum () != player.GetPlayerNum ()) {
+				if (col.transform.tag == "Attack") {
+					downFlg = true;
+				}
+			}
 		}
 	}
 }

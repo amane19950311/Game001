@@ -43,9 +43,11 @@ public class Bullet : MonoBehaviour {
 
 	void OnCollisionEnter(Collision col)
 	{
-		if (col.transform.tag == "Damage") {
-			Destroy (gameObject);
-			return;
+		if (col.gameObject.GetComponent<Player> ().GetPlayerNum () != usePlayer) {
+			if (col.transform.tag == "Damage") {
+				Destroy (gameObject);
+				return;
+			}
 		}
 	}
 }

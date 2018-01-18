@@ -316,7 +316,7 @@ ModelImporter:
     - serializedVersion: 16
       name: BackStep
       takeName: mixamo.com
-      firstFrame: 0
+      firstFrame: 5
       lastFrame: 35
       wrapMode: 0
       orientationOffsetY: -45
