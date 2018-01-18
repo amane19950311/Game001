@@ -278,6 +278,7 @@ ModelImporter:
     4300008: _eye
     4300010: _Fhair2
     7400000: BackStep
+    7400002: mixamo.com
     9500000: //RootNode
     13700000: _body
     13700002: _eye
@@ -325,9 +326,9 @@ ModelImporter:
       hasAdditiveReferencePose: 0
       loopTime: 1
       loopBlend: 1
-      loopBlendOrientation: 0
+      loopBlendOrientation: 1
       loopBlendPositionY: 0
-      loopBlendPositionXZ: 0
+      loopBlendPositionXZ: 1
       keepOriginalOrientation: 0
       keepOriginalPositionY: 1
       keepOriginalPositionXZ: 0

@@ -4,26 +4,48 @@ using UnityEngine;
 
 public class Player: MonoBehaviour {
 
-	[SerializeField]
-	private Animator anim = null;
+	//プレイヤー情報関連
+	private Rigidbody rb;		//RigidBodyの取得
 
 	[SerializeField]
-	float move = 0.05f;
+	private Animator anim = null;	//アニメーターの取得
 
-	private bool jumpFlg = false;
+	//移動関連
+	[SerializeField]
+	private float VELOCITY_RESET = 1;	//加速度の定数
+
+	private float velocity = 1;		//加速度
 
 	[SerializeField]
-	GameObject guard = null;
+	private float move = 0.05f;		//移動量
 
-	private bool guardFlg = false;
+	[SerializeField]//テスト
+	private bool moveFlg = false;	//移動フラグ
 
-	private Rigidbody rb;
+	//ジャンプ関連
+	[SerializeField]//テスト
+	private bool jumpFlg = false;	//ジャンプフラグ
+
+	private bool onGroundFlg = true;	//地面着地フラグ
+
+	//ガード関連
+	[SerializeField]
+	GameObject guard = null;		//ガードオブジェクト
+
+	private bool guardFlg = false;	//ガードフラグ
+
+
+
+	float GRAVITY = -0.098f;	//重力
 
 	[SerializeField]
-	private float VELOCITY_RESET = 1;
-	private float velocity = 1;
+	GameObject bullet;
 
-	float GRAVITY = -0.098f;
+	[SerializeField]
+	Transform bulletCreatePos;
+
+	bool bulletFlg = false;
+	int bulletCreateCnt = 30;
 
 	// Use this for initialization
 	void Start () {
@@ -37,12 +59,7 @@ public class Player: MonoBehaviour {
 
 		Action ();		//アクション処理
 
-		//if(!jumpFlg)
-		//{
-			Jump ();		//ジャンプ処理
-		//}
-
-		//transform.position += new Vector3 (0.0f, -0.98f, 0.0f);
+		Jump ();		//ジャンプ処理
 
 		if (transform.position.y < -0.1f) {
 			transform.position = new Vector3 (transform.position.x, -0.1f, 1.0f);
@@ -57,6 +74,7 @@ public class Player: MonoBehaviour {
 	/// </summary>
 	private void Move()
 	{
+		
 		//コントローラ処理
 		/*if (Input.GetAxis ("Vertical")) {
 
@@ -66,16 +84,43 @@ public class Player: MonoBehaviour {
 
 		}*/
 
-		anim.SetBool ("BackStep",Input.GetKey (KeyCode.A));
+
 
 		//キーボード処理
+		//左移動
 		if (Input.GetKey (KeyCode.A)) {
-			//transform.position += new Vector3 (-1.0f, 0, 0) * move;
-		} else if (Input.GetKey (KeyCode.D)) {
-			transform.position += new Vector3 (1.0f, 0, 0) * move;
-		} else {
-			transform.position += new Vector3 (Input.GetAxis ("Horizontal"), 0, 0) * move;
+			
+			transform.position += new Vector3 (-1.0f, 0, 0) * move;
+
+			//移動フラグ
+			moveFlg = true;
+
+			//再生
+			anim.SetFloat ("Return", 1);
+
 		}
+
+		//右移動
+		else if (Input.GetKey (KeyCode.D)) {
+			transform.position += new Vector3 (1.0f, 0, 0) * ((jumpFlg) ? move * 1.5f : move);
+
+			//移動フラグ
+			moveFlg = true;
+
+			//逆再生
+			anim.SetFloat ("Return", -1);
+		} 
+
+		//停止
+		else {
+			transform.position += new Vector3 (Input.GetAxis ("Horizontal"), 0, 0) * move;
+
+			//移動フラグ
+			moveFlg = false;
+
+		}
+
+		anim.SetBool ("Step",moveFlg);	//移動アニメーション
 
 
 	}
@@ -92,11 +137,38 @@ public class Player: MonoBehaviour {
 		}
 
 		//ガード処理
-		if (Input.GetKey (KeyCode.LeftShift) || Input.GetButtonDown ("Action2")) {
+		if (Input.GetKeyDown (KeyCode.LeftShift) || Input.GetButtonDown ("Action2")) {
 			guardFlg = true;
 		} else {
 			guardFlg = false;
 		}
+
+		//バレット処理
+		if (!bulletFlg) {
+			if (Input.GetKeyDown (KeyCode.K)) {
+
+				if (!bulletFlg) {
+					
+				}
+
+				bulletFlg = true;
+			}
+		} else {
+			if (bulletCreateCnt <= 0) {
+				bulletFlg = false;
+				bulletCreateCnt = 30;
+			} else {
+				bulletCreateCnt--;
+
+				if (bulletCreateCnt == 15) {
+					GameObject b = Instantiate (bullet, bulletCreatePos.position, Quaternion.identity);
+
+					b.GetComponent<Bullet> ().SetUsePlayer (0);
+				}
+			}
+		}
+		anim.SetBool ("Bullet", bulletFlg);
+
 
 		guard.SetActive (guardFlg);
 	}
@@ -105,18 +177,24 @@ public class Player: MonoBehaviour {
 	/// ジャンプ処理
 	/// </summary>
 	private void Jump()
-	{
+	{		
+		//ジャンプ中でなければジャンプを有効
 		if (!jumpFlg) {
-			if (Input.GetKey (KeyCode.Space) || Input.GetButtonDown ("Jump")) {
+			if (Input.GetKeyDown (KeyCode.Space) || Input.GetButtonDown ("Jump")) {
 				jumpFlg = true;
+				onGroundFlg = false;
 			}
 		}
+
+		//ジャンプ中処理
 		if (jumpFlg) {
 			transform.position += new Vector3(0f,velocity,0f);
 
-			velocity += GRAVITY;
+			velocity += (velocity < 0.5f && velocity > -0.5f) ? GRAVITY * 0.2f : GRAVITY;
 
-		}			
+		}	
+
+		anim.SetBool ("Jump", jumpFlg);		//ジャンプアニメーション
 	}
 
 	/// <summary>
@@ -127,8 +205,9 @@ public class Player: MonoBehaviour {
 	{
 		//地面に着地
 		if (col.transform.tag == "Field") {
+			onGroundFlg = true;		//着地フラグ
 			jumpFlg = false;
-			velocity = VELOCITY_RESET;
+			velocity = VELOCITY_RESET;	//加速度の初期化
 		}
 	}
 }
