@@ -83,7 +83,7 @@ Material:
     - _Mix_KageTexture: 0.5
     - _Mode: 0
     - _OcclusionStrength: 1
-    - _Outline: 0.001
+    - _Outline: 0.002
     - _Outline_Width: 0
     - _Parallax: 0.02
     - _Rim_Sharpness: 1
@@ -95,7 +95,7 @@ Material:
     - _isKage_Normal: 0
     - _isRim_Normal: 0
     m_Colors:
-    - _Color: {r: 1, g: 0.9393509, b: 0.8088235, a: 1}
+    - _Color: {r: 0.7058823, g: 0.7058823, b: 0.7058823, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _Line_Color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
     - _OutlineColor: {r: 0, g: 0, b: 0, a: 0}
